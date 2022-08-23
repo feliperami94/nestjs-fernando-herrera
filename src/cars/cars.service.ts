@@ -1,7 +1,7 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { randomUUID } from 'crypto';
 import {v4 as uuid} from 'uuid'
-import { CreateCarDto } from './dto/create-car.dto';
+import { CreateCarDto, UpdateCarDto } from './dto';
 import { Car } from './interfaces/car.interface';
 
 
@@ -38,7 +38,6 @@ export class CarsService {
         const car =  this.cars.find(car => car.id === id);
         if(!car){
             throw new NotFoundException(`Car with id: ${id} not found`);
-            
         }
         return car;
     }
@@ -50,6 +49,26 @@ export class CarsService {
         }
         this.cars.push(car);
         return car
+
+    }
+
+    updateCar(id: string, updateCarDto: UpdateCarDto){
+
+        let carDB = this.findById(id);
+
+        if(updateCarDto.id && updateCarDto.id !== id)
+            throw new BadRequestException('Car id inside body is different from the path id')
+
+        this.cars = this.cars.map(car =>{
+            if(car.id === id){
+                carDB = {...carDB, ...updateCarDto, id}
+                return carDB
+            }
+            return car
+        })
+
+
+        return carDB; //Updated car
 
     }
 
