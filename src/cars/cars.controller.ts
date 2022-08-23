@@ -1,7 +1,9 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, ParseUUIDPipe, Patch, Post, UsePipes, ValidationPipe } from '@nestjs/common';
 import { CarsService } from './cars.service';
+import { CreateCarDto } from './dto/create-car.dto';
 
 @Controller('cars')
+//@UsePipes(ValidationPipe) //Can be used before a specific controller method, just after the request decorator. Not being used because I'm using the validation pipe globally
 export class CarsController {
 
     constructor(
@@ -15,21 +17,19 @@ export class CarsController {
     }
 
     @Get('/:id')
-    getCarById(@Param('id', ParseIntPipe) id: number){
-        console.log(id)
+    getCarById(@Param('id', ParseUUIDPipe) id: string){
         return this.carsService.findById(id);
     }
 
     @Post()
-    createCar(@Body() body: any){
-        return{
-            body
-        }
+    createCar(@Body() createCarDto: CreateCarDto){
+        return this.carsService.createNewCar(createCarDto);
+        
     }
 
     @Patch('/:id')
     updateCar(
-        @Param('id', ParseIntPipe) id: number, 
+        @Param('id', ParseUUIDPipe) id: string, 
         @Body() body: any){
         return{
             body,
@@ -38,7 +38,7 @@ export class CarsController {
     }
 
     @Delete('/:id')
-    deleteCar(@Param('id', ParseIntPipe) id: number){
+    deleteCar(@Param('id', ParseIntPipe) id: string){
         return {
             method: 'delete',
             id
