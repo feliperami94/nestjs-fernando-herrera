@@ -66,9 +66,19 @@ export class CarsService {
             }
             return car
         })
-
-
         return carDB; //Updated car
+
+    }
+
+    delete(id: string){
+
+        let carDB = this.findById(id);
+
+        if(!carDB)
+            throw new BadRequestException('Car id is not valid');
+        
+        this.cars = this.cars.filter(car => car.id !== id)
+        return ;
 
     }
 
